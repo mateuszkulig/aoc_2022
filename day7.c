@@ -158,6 +158,19 @@ int getDirSize(systemDir *dir) {
     return total;
 }
 
+long computeDirsOfMaxSize(systemDir *dir, int maxSize) {
+    static long total=0;
+    int size;
+    for(int i=0; i<dir->dirCounter; ++i) {
+        size = getDirSize(&dir->dirs[i]);
+        if (size < maxSize) {
+            total += size;
+        }
+        computeDirsOfMaxSize(&dir->dirs[i], maxSize);
+    }
+    return total;
+}
+
 int main(int argc, char **argv) {
     FILE *inputFile;
     systemDir *currentDir;
@@ -176,11 +189,9 @@ int main(int argc, char **argv) {
         // printf("current dir: %s\n", currentDir->name);
     }
     
+
     currentDir = &root;
-    printf("%s\t%d\t%d\n", currentDir->name, currentDir->dirCounter, getDirSize(currentDir));
-    for(int i=0; i<currentDir->dirCounter; i++) {
-        printf("%s\t%d\t%d\n", currentDir->dirs[i].name, currentDir->dirs[i].fileCounter, getDirSize(&currentDir->dirs[i]));
-    }
-    printf("%s\t%d\t%d\n", currentDir->dirs[0].dirs[0].name, currentDir->dirs[0].dirs[0].fileCounter, getDirSize(&currentDir->dirs[0].dirs[0]));
+
+    printf("%d", computeDirsOfMaxSize(currentDir, 100000));
     return 0;
 }
