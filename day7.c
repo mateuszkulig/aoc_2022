@@ -115,28 +115,30 @@ systemCommand *parse(char *cmd) {
     return parsedCommand;
 }
 
-void interpret(systemDir *currentDir, systemCommand* currentCommand) {
+void interpret(systemDir **currentDir, systemCommand* currentCommand) {
     switch (currentCommand->isOutput) {
         case 1:
             if (currentCommand->arg1[0] == 'd') {
-                setDir(&currentDir->dirs[currentDir->dirCounter], currentCommand->arg2, currentDir);
-                currentDir->dirCounter++;
+                setDir(&(*currentDir)->dirs[(*currentDir)->dirCounter], currentCommand->arg2, *currentDir);
+                (*currentDir)->dirCounter++;
             } else {
-                setFile(&currentDir->files[currentDir->fileCounter], currentCommand->arg2, currentCommand->arg1);
-                currentDir->fileCounter++;
+                setFile(&(*currentDir)->files[(*currentDir)->fileCounter], currentCommand->arg2, currentCommand->arg1);
+                (*currentDir)->fileCounter++;
             }
             break;
         case 0:
             if (currentCommand->arg1[0] == 'l') {}  // command is ls
             // command is cd ..
             else if (currentCommand->arg1[0] == 'c' && currentCommand->arg1[3] == '.') {
-                currentDir = currentDir->parent;
+                *currentDir = (*currentDir)->parent;
             // command is cd {arg}
             } else {
-                for(int i=0; i<currentDir->dirCounter; ++i) {
+                for(int i=0; i<(*currentDir)->dirCounter; ++i) {
                     // printf("%s ?= %s: %d\n", currentDir->dirs[i].name, currentCommand->arg2, strcmp(currentDir->dirs[i].name, currentCommand->arg2) == 0);
-                    if (strcmp(currentDir->dirs[i].name, currentCommand->arg2) == 0){
-                        currentDir = &currentDir->dirs[i];
+                    if (strcmp((*currentDir)->dirs[i].name, currentCommand->arg2) == 0) {
+                        // printf("current dir: %s\n", (*currentDir)->name);
+                        *currentDir = &(*currentDir)->dirs[i];
+                        // printf("new dir: %s\n", (*currentDir)->name);
                     }
                 }
             }
@@ -173,14 +175,15 @@ int main(int argc, char **argv) {
 
     while (fgets(cmd, 64, inputFile) != NULL) {
         currentCommand = parse(cmd);
-        interpret(currentDir, currentCommand);
+        interpret(&currentDir, currentCommand);
+        // printf("current dir: %s\n", currentDir->name);
     }
     
     currentDir = &root;
-    printf("%s\t%d\t%d\n", currentDir->name, currentDir->dirCounter, getDirSize(currentDir));
-    // for(int i=0; i<currentDir->dirCounter; i++) {
-    //     printf("%s\t%d\t%d\n", currentDir->dirs[i].name, currentDir->dirs[i].dirCounter, getDirSize(&currentDir->dirs[i]));
-    // }
+    // printf("%s\t%d\t%d\n", currentDir->name, currentDir->dirCounter, getDirSize(currentDir));
+    for(int i=0; i<currentDir->dirCounter; i++) {
+        printf("%s\t%d\t%d\n", currentDir->dirs[i].name, currentDir->dirs[i].fileCounter, getDirSize(&currentDir->dirs[i]));
+    }
     
     return 0;
 }
