@@ -158,8 +158,8 @@ int getDirSize(systemDir *dir) {
     return total;
 }
 
-long computeDirsOfMaxSize(systemDir *dir, int maxSize) {
-    static long total=0;
+int computeDirsOfMaxSize(systemDir *dir, int maxSize) {
+    static int total=0;
     int size;
     for(int i=0; i<dir->dirCounter; ++i) {
         size = getDirSize(&dir->dirs[i]);
