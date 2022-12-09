@@ -2,6 +2,8 @@
 #include "stdlib.h"
 #include "string.h"
 
+#define TOTALSPACE 70000000
+
 typedef struct systemFile
 {
     int size;
@@ -171,11 +173,29 @@ int computeDirsOfMaxSize(systemDir *dir, int maxSize) {
     return total;
 }
 
+int getSmallestFreeup(systemDir *dir, int usedSpace, int targetSpace) {
+    static int smallest = TOTALSPACE;
+    int size;
+    int freeSpace = TOTALSPACE - usedSpace;
+    int minimalFreeup = targetSpace - freeSpace;
+    for (int i=0; i<dir->dirCounter; ++i) {
+        size = getDirSize(&dir->dirs[i]);
+        if (size > minimalFreeup && smallest > size) {
+            smallest = size;
+        }
+        getSmallestFreeup(&dir->dirs[i], usedSpace, targetSpace);
+    }
+    return smallest;
+}
+
 int main(int argc, char **argv) {
     FILE *inputFile;
     systemDir *currentDir;
     systemCommand *currentCommand;
     char cmd[64];
+
+    int usedSpace;
+
 
     systemDir root;
     setDir(&root, "/\0", &root);
@@ -186,12 +206,13 @@ int main(int argc, char **argv) {
     while (fgets(cmd, 64, inputFile) != NULL) {
         currentCommand = parse(cmd);
         interpret(&currentDir, currentCommand);
-        // printf("current dir: %s\n", currentDir->name);
     }
     
+    usedSpace = getDirSize(&root);
 
-    currentDir = &root;
+    printf("%d\n", computeDirsOfMaxSize(&root, 100000));
+    printf("%d\n", usedSpace);
+    printf("%d\n", getSmallestFreeup(&root, usedSpace, 30000000));
 
-    printf("%d", computeDirsOfMaxSize(currentDir, 100000));
     return 0;
 }
