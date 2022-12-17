@@ -1,6 +1,16 @@
 #include "stdio.h"
 #include "stdlib.h"
 
+// print the contents of 2d array
+void show(int **arr2d, int nx, int ny) {
+    for(int i=0; i<ny; ++i) {
+        for(int j=0; j<nx; ++j) {
+            printf("%d ", arr2d[j][i]); // i and j could probably be flipped
+        }
+        printf("\n");
+    }
+}
+
 int main(int argc, char **argv) {
     int     width = 0;
     int     height = 0;
@@ -8,7 +18,8 @@ int main(int argc, char **argv) {
     FILE    *inputFile;
     int     currentW = 0;
     int     currentH = 0;
-    char    **field;
+    int     **field;
+    char    atoiBuffer[2] = {'\0', '\0'};
 
     // get the dimentions of field
     inputFile = fopen("input8.txt", "r");
@@ -27,26 +38,24 @@ int main(int argc, char **argv) {
     fclose(inputFile);
 
     // allocate memory for field
-    field = malloc(sizeof(char*)*width);
+    field = malloc(sizeof(int*)*width);
     for(int i=0; i<height; ++i) {
-        field[i] = malloc(sizeof(char)*height);
+        field[i] = malloc(sizeof(int)*height);
     }
 
     // fill the rows and columns
     inputFile = fopen("input8.txt", "r");
-
     int k=0;
     while(fgets(buffer, 128, inputFile) != NULL) {
-        printf("%s", buffer);
         for(int i=0; i<width; ++i) {
-            field[i][k]=buffer[i];
+            atoiBuffer[0] = buffer[i];
+            field[i][k]=atoi(atoiBuffer);
         }
         ++k;
     }
     fclose(inputFile);
 
-    printf("\n%c", field[0][2]);
 
-    // printf("%d\t%d\n", width, height);
+    show(field, width, height);
     return 0;
 }
