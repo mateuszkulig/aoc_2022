@@ -20,6 +20,7 @@ int main(int argc, char **argv) {
     int     currentH = 0;
     int     **field;
     char    atoiBuffer[2] = {'\0', '\0'};
+    int     k = 0;
 
     // get the dimentions of field
     inputFile = fopen("input8.txt", "r");
@@ -39,13 +40,12 @@ int main(int argc, char **argv) {
 
     // allocate memory for field
     field = malloc(sizeof(int*)*width);
-    for(int i=0; i<height; ++i) {
+    for(int i=0; i<width; ++i) {
         field[i] = malloc(sizeof(int)*height);
     }
 
     // fill the rows and columns
     inputFile = fopen("input8.txt", "r");
-    int k=0;
     while(fgets(buffer, 128, inputFile) != NULL) {
         for(int i=0; i<width; ++i) {
             atoiBuffer[0] = buffer[i];
@@ -55,7 +55,13 @@ int main(int argc, char **argv) {
     }
     fclose(inputFile);
 
-
     show(field, width, height);
+
+    // free the memory
+    for(int i=0; i<height; ++i) {
+        free(field[i]);
+    }
+    free(field);
+    
     return 0;
 }
