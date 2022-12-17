@@ -17,10 +17,17 @@ int isVisible(int **treeField, int x, int y, int width, int height) {
     int visibleUp = 1;
     int visibleDown = 1;
 
+    // for scores, border trees can be ignored because one of scores will be 0, and because of that 0 * ... = 0
+    int scoreLeft = 0;
+    int scoreRight = 0;
+    int scoreUp = 0;
+    int scoreDown = 0;
+
     // printf("\n---COMPARATION---\n");
 
     for(int i=x-1; i>=0; --i) { // going left from tree
         // printf("comparing to left: %d\n", treeField[i][y]);
+        scoreLeft++;
         if(treeField[i][y] >= treeField[x][y]) {
             visibleLeft = 0;
             break;
@@ -29,6 +36,7 @@ int isVisible(int **treeField, int x, int y, int width, int height) {
 
     for(int i=x+1; i<width; ++i) { // going right from tree
         // printf("comparing to right: %d\n", treeField[i][y]);
+        scoreRight++;
         if(treeField[i][y] >= treeField[x][y]) {
             visibleRight = 0;
             break;
@@ -37,6 +45,7 @@ int isVisible(int **treeField, int x, int y, int width, int height) {
 
     for(int i=y-1; i>=0; --i) { // going up from tree
         // printf("comparing to up: %d\n", treeField[x][i]);
+        scoreUp++;
         if(treeField[x][i] >= treeField[x][y]) {
             visibleUp = 0;
             break;
@@ -45,6 +54,7 @@ int isVisible(int **treeField, int x, int y, int width, int height) {
 
     for(int i=y+1; i<height; ++i) { // going down from tree
         // printf("comparing to down: %d\n", treeField[x][i]);
+        scoreDown++;
         if(treeField[x][i] >= treeField[x][y]) {
             visibleDown = 0;
             break;
@@ -55,16 +65,35 @@ int isVisible(int **treeField, int x, int y, int width, int height) {
     // printf("\n%d(%d,%d) is visible from up: %d\n", treeField[x][y], x, y, visibleUp);
     // printf("\n%d(%d,%d) is visible from down: %d\n", treeField[x][y], x, y, visibleDown);
     // printf("\n%d(%d,%d) is visible: %d\n", treeField[x][y], x, y, visibleLeft || visibleRight || visibleDown || visibleUp);
-    return (visibleLeft || visibleRight || visibleDown || visibleUp);
-    
+
+    if (visibleLeft || visibleRight || visibleDown || visibleUp) {
+        return scoreLeft * scoreRight * scoreDown * scoreUp;
+    } else
+    return 0;   
+}
+
+int getHighestScenic(int **treeField, int width, int height) {
+    int highest = 0;
+    int treeScore;
+    for (int i=1; i<width-1; i++) {
+        for (int j=1; j<height-1; j++) {
+            treeScore = isVisible(treeField, j, i, width, height);  // note: function is done in a way that if tree with best scenic
+                                                                    // is highest it wont be returned
+            if (treeScore>highest) {
+                highest = treeScore;
+            } 
+        }
+    }
+    return highest;
 }
 
 int getVisibleTrees(int **treeField, int width, int height) {
     int total = ((width+height)*2)-4;   // starts with all border trees; -4 for duplicates at corners
     for (int i=1; i<width-1; i++) {
         for (int j=1; j<height-1; j++) {
-            total += isVisible(treeField, j, i, width, height);
-            
+            if (isVisible(treeField, j, i, width, height)) {
+                 total++; 
+            }
         }
     }
     return total;
@@ -117,6 +146,7 @@ int main(int argc, char **argv) {
     // show(field, width, height);
 
     printf("%d\n", getVisibleTrees(field, width, height));
+    printf("%d\n", getHighestScenic(field, width, height));
 
     // free the memory
     for(int i=0; i<height; ++i) {
