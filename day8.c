@@ -11,6 +11,65 @@ void show(int **arr2d, int nx, int ny) {
     }
 }
 
+int isVisible(int **treeField, int x, int y, int width, int height) {
+    // int visible = 1;
+    int visibleRight = 1;
+    int visibleLeft = 1;
+    int visibleUp = 1;
+    int visibleDown = 1;
+    printf("\n---COMPARATION---\n");
+    for(int i=x-1; i>=0; --i) { // going left from tree
+        printf("comparing to left: %d\n", treeField[i][y]);
+        if(treeField[i][y] >= treeField[x][y]) {
+            visibleLeft = 0;
+            break;
+        }
+    }
+
+    for(int i=x+1; i<width; ++i) { // going right from tree
+        printf("comparing to right: %d\n", treeField[i][y]);
+        if(treeField[i][y] >= treeField[x][y]) {
+            visibleRight = 0;
+            break;
+        }
+    }
+
+    for(int i=y-1; i>=0; --i) { // going up from tree
+        printf("comparing to up: %d\n", treeField[x][i]);
+        if(treeField[x][i] >= treeField[x][y]) {
+            visibleUp = 0;
+            break;
+        }
+    }
+
+    for(int i=y+1; i<height; ++i) { // going down from tree
+        printf("comparing to down: %d\n", treeField[x][i]);
+        if(treeField[x][i] >= treeField[x][y]) {
+            visibleDown = 0;
+            break;
+        }
+    }
+    printf("\n%d(%d,%d) is visible from left: %d\n", treeField[x][y], x, y, visibleLeft);
+    printf("\n%d(%d,%d) is visible from right: %d\n", treeField[x][y], x, y, visibleRight);
+    printf("\n%d(%d,%d) is visible from up: %d\n", treeField[x][y], x, y, visibleUp);
+    printf("\n%d(%d,%d) is visible from down: %d\n", treeField[x][y], x, y, visibleDown);
+    printf("\n%d(%d,%d) is visible: %d\n", treeField[x][y], x, y, visibleLeft || visibleRight || visibleDown || visibleUp);
+    return (visibleLeft || visibleRight || visibleDown || visibleUp);
+    
+}
+
+int getVisibleTrees(int **treeField, int width, int height) {
+    int total = 0;
+    for (int i=1; i<width-1; i++) {
+        for (int j=1; j<height-1; j++) {
+            total += isVisible(treeField, j, i, width, height);
+            
+        }
+    }
+    printf("\n---\ntotal:\t%d\n", total);
+    return total;
+}
+
 int main(int argc, char **argv) {
     int     width = 0;
     int     height = 0;
@@ -56,6 +115,8 @@ int main(int argc, char **argv) {
     fclose(inputFile);
 
     show(field, width, height);
+
+    getVisibleTrees(field, width, height);
 
     // free the memory
     for(int i=0; i<height; ++i) {
