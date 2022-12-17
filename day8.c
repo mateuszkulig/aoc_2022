@@ -67,7 +67,6 @@ int getVisibleTrees(int **treeField, int width, int height) {
             
         }
     }
-    printf("\n---\ntotal:\t%d\n", total);
     return total;
 }
 
@@ -117,7 +116,7 @@ int main(int argc, char **argv) {
 
     // show(field, width, height);
 
-    getVisibleTrees(field, width, height);
+    printf("%d\n", getVisibleTrees(field, width, height));
 
     // free the memory
     for(int i=0; i<height; ++i) {
