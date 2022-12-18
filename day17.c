@@ -109,22 +109,11 @@ void addShape(Shape *chamber, Shape *sh) {
 
 // fall down shape by one block
 int fallDown(Shape *chamber, int shapeWidth) {
-    // int*    canFallDownArr = malloc(sizeof(int) * shapeWidth);
-    // int     canFallDownCond = 1;
-    // int     currElement = 0;
-
-    // for (int i=0; i<shapeWidth; ++i) {
-    //     canFallDownArr[i] = 0;
-    // }
-
     // fall down condition checking; exit function if cannot fall
     for (int i=0; i<chamber->height; ++i) {
         for (int j=0; j<chamber->width; ++j) {
             if (chamber->grid[j][i] == '@' && (chamber->grid[j][i+1] == '#' || i == chamber->height-1)) {
-                // canFallDownCond = 0;
                 return 0;
-                // canFallDownArr[currElement % shapeWidth] = 1;
-                // currElement++;
             }
         }
     }
@@ -138,8 +127,6 @@ int fallDown(Shape *chamber, int shapeWidth) {
             }
         }
     }
-
-    // free(canFallDownArr);
 
     return 1;
 }
@@ -173,10 +160,6 @@ int main(int argc, char **argv) {
     setShape(&rocks[2], artTwo, 3, 3);
     setShape(&rocks[3], artThree, 1, 4);
     setShape(&rocks[4], artFour, 2, 2);
-
-    // show(chamber.grid, 7, 1);
-    // addShape(&chamber, &rocks[1]);
-    // printf("\n");
     
     mainLoop(&chamber, rocks);
 
