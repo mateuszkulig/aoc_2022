@@ -78,14 +78,40 @@ void reallocChamber(Shape *cham, int newHeight) {
 
     freeShape(cham);
     cham->grid = newGrid;
+    cham->height = newHeight;
 }
 
 // adds shape to the top of chamber
 void addShape(Shape *chamber, Shape *sh) {
-    for (int i=0; i<sh->height; ++i) {
+    int k = 0;
+    int brkK = 0;
+    for (k; k<chamber->height; ++k) {   // find the highest spot
+        for (int i=0; i<chamber->width; ++i) {
+            if (chamber->grid[i][k] == '#') {
+                brkK = 1;
+                break;
+            }
+        }
+        if (brkK) {
+            break;
+        }
+    }
+    printf("\nk:\t%d, sh height:\t%d, ch height:\t%d\n", k, sh->height, chamber->height);
+
+    reallocChamber(chamber, chamber->height-k+sh->height+3);    // realloc to fit new shape; +3 for gap
+
+    for (int i=0; i<sh->height; ++i) {  // add shape to chamber grid
         for (int j=0; j<sh->width; ++j) {
             chamber->grid[j+2][i] = sh->grid[j][i];
         }
+    }
+}
+
+// main loop of moving
+void mainLoop(Shape *chamber, Shape *rocks) {
+    for (int i=0; i<8; ++i) {
+        addShape(chamber, &rocks[i%5]);
+        show(chamber->grid, chamber->width, chamber->height);
     }
 }
 
@@ -108,11 +134,11 @@ int main(int argc, char **argv) {
     setShape(&rocks[3], artThree, 1, 4);
     setShape(&rocks[4], artFour, 2, 2);
 
-    show(chamber.grid, 7, 1);
-    reallocChamber(&chamber, 7);
-    addShape(&chamber, &rocks[4]);
-    printf("\n");
-    show(chamber.grid, 7, 7);
+    // show(chamber.grid, 7, 1);
+    // addShape(&chamber, &rocks[1]);
+    // printf("\n");
+    
+    mainLoop(&chamber, rocks);
 
     // memory freeup
     for (int i=0; i<5; ++i) {
