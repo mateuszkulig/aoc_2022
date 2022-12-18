@@ -87,7 +87,7 @@ void addShape(Shape *chamber, Shape *sh) {
     int brkK = 0;
     for (k; k<chamber->height; ++k) {   // find the highest spot
         for (int i=0; i<chamber->width; ++i) {
-            if (chamber->grid[i][k] == '#') {
+            if (chamber->grid[i][k] == '@') {
                 brkK = 1;
                 break;
             }
@@ -107,11 +107,51 @@ void addShape(Shape *chamber, Shape *sh) {
     }
 }
 
+// fall down shape by one block
+int fallDown(Shape *chamber, int shapeWidth) {
+    // int*    canFallDownArr = malloc(sizeof(int) * shapeWidth);
+    // int     canFallDownCond = 1;
+    // int     currElement = 0;
+
+    // for (int i=0; i<shapeWidth; ++i) {
+    //     canFallDownArr[i] = 0;
+    // }
+
+    // fall down condition checking; exit function if cannot fall
+    for (int i=0; i<chamber->height; ++i) {
+        for (int j=0; j<chamber->width; ++j) {
+            if (chamber->grid[j][i] == '@' && (chamber->grid[j][i+1] == '#' || i == chamber->height-1)) {
+                // canFallDownCond = 0;
+                return 0;
+                // canFallDownArr[currElement % shapeWidth] = 1;
+                // currElement++;
+            }
+        }
+    }
+
+    // actual falling down
+    for (int i=chamber->height; i>=0; --i) {    // from bottom to top
+        for (int j=0; j<chamber->width; ++j) {
+            if (chamber->grid[j][i] == '@') {   // for each @ (rock element)
+                    chamber->grid[j][i+1] = '@';
+                    chamber->grid[j][i] = '.';
+            }
+        }
+    }
+
+    // free(canFallDownArr);
+
+    return 1;
+}
+
 // main loop of moving
 void mainLoop(Shape *chamber, Shape *rocks) {
-    for (int i=0; i<8; ++i) {
+    for (int i=0; i<1; ++i) {
         addShape(chamber, &rocks[i%5]);
         show(chamber->grid, chamber->width, chamber->height);
+        while (fallDown(chamber, rocks[i%5].width)) {
+            show(chamber->grid, chamber->width, chamber->height);
+        }
     }
 }
 
@@ -121,11 +161,11 @@ int main(int argc, char **argv) {
     Shape   rocks[5];
 
     char    artChamber[7*1] = ".......";
-    char    artZero[4*1] = "####";
-    char    artOne[3*3] = ".#.###.#.";
-    char    artTwo[3*3] = "..#..####";
-    char    artThree[1*4] = "####";
-    char    artFour[2*2] = "####";
+    char    artZero[4*1] = "@@@@";
+    char    artOne[3*3] = ".@.@@@.@.";
+    char    artTwo[3*3] = "..@..@@@@";
+    char    artThree[1*4] = "@@@@";
+    char    artFour[2*2] = "@@@@";
 
     setShape(&chamber, artChamber, 7, 1);
     setShape(&rocks[0], artZero, 4, 1);
