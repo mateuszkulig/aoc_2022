@@ -94,21 +94,21 @@ int main(int argc, char **argv) {
     Shape   chamber;
     Shape   rocks[5];
 
-    char    artChamber[7*4] = "............................";
+    char    artChamber[7*1] = ".......";
     char    artZero[4*1] = "####";
     char    artOne[3*3] = ".#.###.#.";
     char    artTwo[3*3] = "..#..####";
     char    artThree[1*4] = "####";
     char    artFour[2*2] = "####";
 
-    setShape(&chamber, artChamber, 7, 4);
+    setShape(&chamber, artChamber, 7, 1);
     setShape(&rocks[0], artZero, 4, 1);
     setShape(&rocks[1], artOne, 3, 3);
     setShape(&rocks[2], artTwo, 3, 3);
     setShape(&rocks[3], artThree, 1, 4);
     setShape(&rocks[4], artFour, 2, 2);
 
-    show(chamber.grid, 7, 4);
+    show(chamber.grid, 7, 1);
     reallocChamber(&chamber, 7);
     addShape(&chamber, &rocks[4]);
     printf("\n");
