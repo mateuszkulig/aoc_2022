@@ -87,7 +87,7 @@ void addShape(Shape *chamber, Shape *sh) {
     int brkK = 0;
     for (k; k<chamber->height; ++k) {   // find the highest spot
         for (int i=0; i<chamber->width; ++i) {
-            if (chamber->grid[i][k] == '@') {
+            if (chamber->grid[i][k] == '#') {
                 brkK = 1;
                 break;
             }
@@ -131,21 +131,54 @@ int fallDown(Shape *chamber, int shapeWidth) {
     return 1;
 }
 
+// replaces '@' to '#'
+void solidifyRocks(Shape *chamber) {
+    for (int i=0; i<chamber->height; ++i) {
+        for (int j=0; j<chamber->width; ++j) {
+            if (chamber->grid[j][i] == '@') {
+                chamber->grid[j][i] = '#';
+            }
+        }
+    }
+}
+
 // main loop of moving
 void mainLoop(Shape *chamber, Shape *rocks) {
-    for (int i=0; i<1; ++i) {
+    for (int i=0; i<7; ++i) {
         addShape(chamber, &rocks[i%5]);
         show(chamber->grid, chamber->width, chamber->height);
         while (fallDown(chamber, rocks[i%5].width)) {
             show(chamber->grid, chamber->width, chamber->height);
         }
+        solidifyRocks(chamber);
+        show(chamber->grid, chamber->width, chamber->height);
     }
 }
 
+// load jets into array; return array size
+int loadJets(char *fileName, char *jetArray) {
+    FILE    *inputFile;
+    int     arrSize;
+
+    inputFile = fopen(fileName, "r");
+    fseek(inputFile, 0L, SEEK_END);
+    arrSize = ftell(inputFile) + 1; // looks like it just needs +1; its to late to think why
+    fseek(inputFile, 0L, SEEK_SET);
+
+    jetArray = malloc(sizeof(char)*arrSize);
+    fgets(jetArray, arrSize, inputFile);
+
+    fclose(inputFile);
+    
+    return arrSize;
+}
 
 int main(int argc, char **argv) {
     Shape   chamber;
     Shape   rocks[5];
+
+    char    *jets;
+    int     jetSize;
 
     char    artChamber[7*1] = ".......";
     char    artZero[4*1] = "@@@@";
@@ -161,6 +194,7 @@ int main(int argc, char **argv) {
     setShape(&rocks[3], artThree, 1, 4);
     setShape(&rocks[4], artFour, 2, 2);
     
+    jetSize = loadJets("input17.txt", jets);
     mainLoop(&chamber, rocks);
 
     // memory freeup
