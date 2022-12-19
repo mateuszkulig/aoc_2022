@@ -70,11 +70,21 @@ void reallocChamber(Shape *cham, int newHeight) {
         }
     }
 
-    for (int i=0; i<oldHeight; ++i) {
-        for (int j=0; j<7; ++j) {
-            newGrid[j][i+heightDiff] = cham->grid[j][i];
+    if (heightDiff >= 0) {
+        for (int i=0; i<oldHeight; ++i) {
+            for (int j=0; j<7; ++j) {
+                newGrid[j][i+heightDiff] = cham->grid[j][i];
+            }
+        }
+    } else {
+        for (int i=0; i<oldHeight; ++i) {
+            for (int j=0; j<7; ++j) {
+                newGrid[j][i] = cham->grid[j][i-heightDiff];
+            }
         }
     }
+
+    
 
     freeShape(cham);
     cham->grid = newGrid;
@@ -190,8 +200,9 @@ void mainLoop(Shape *chamber, Shape *rocks, char *jetStream, int jetSize) {
             alternate = !alternate;
         }
         solidifyRocks(chamber);
-        show(rocks[i%5].grid, rocks[i%5].width, rocks[i%5].height);
-        show(chamber->grid, chamber->width, chamber->height);
+        // show(rocks[i%5].grid, rocks[i%5].width, rocks[i%5].height);
+        // show(chamber->grid, chamber->width, chamber->height);
+        printf("%d\n", i);
     }
 }
 
@@ -237,6 +248,7 @@ int main(int argc, char **argv) {
     jetSize = loadJets("input17.txt", &jets);
     mainLoop(&chamber, rocks, jets, jetSize);
 
+    show(chamber.grid, chamber.width, chamber.height);
     printf("%d\n", chamber.height);
 
     // memory freeup
