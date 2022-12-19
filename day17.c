@@ -117,7 +117,6 @@ int move(Shape *chamber, int shapeWidth, char direction) {
                 (direction == '>' && (j == chamber->width-1 || chamber->grid[j+1][i] == '#')) ||
                 (direction == '<' && (j == 0 || chamber->grid[j-1][i] == '#')))
             ) {
-                printf("returning 1\n");
                 return 1;
             }
         }
@@ -177,23 +176,27 @@ void solidifyRocks(Shape *chamber) {
 }
 
 // main loop of moving
-void mainLoop(Shape *chamber, Shape *rocks) {
-    int alternate = 0;
+void mainLoop(Shape *chamber, Shape *rocks, char *jetStream, int jetSize) {
+    int alternate;
+    int jetCounter = 0;
 
-    for (int i=0; i<1; ++i) {
+    for (int i=0; i<2022; ++i) {
+        alternate = 1;  // always start from left/right push
         addShape(chamber, &rocks[i%5]);
-        show(chamber->grid, chamber->width, chamber->height);
-        while (move(chamber, rocks[i%5].width, alternate ? '>' : '|')) {
-            show(chamber->grid, chamber->width, chamber->height);
+        while (move(chamber, rocks[i%5].width, alternate ? jetStream[jetCounter%jetSize] : '|')) {
+            if (alternate) {
+                jetCounter++;
+            }
             alternate = !alternate;
         }
         solidifyRocks(chamber);
+        show(rocks[i%5].grid, rocks[i%5].width, rocks[i%5].height);
         show(chamber->grid, chamber->width, chamber->height);
     }
 }
 
 // load jets into array; return array size
-int loadJets(char *fileName, char *jetArray) {
+int loadJets(char *fileName, char **jetArray) {
     FILE    *inputFile;
     int     arrSize;
 
@@ -202,11 +205,11 @@ int loadJets(char *fileName, char *jetArray) {
     arrSize = ftell(inputFile) + 1; // looks like it just needs +1; its to late to think why
     fseek(inputFile, 0L, SEEK_SET);
 
-    jetArray = malloc(sizeof(char)*arrSize);
-    fgets(jetArray, arrSize, inputFile);
+    *jetArray = malloc(sizeof(char)*arrSize);
+    fgets(*jetArray, arrSize, inputFile);
 
     fclose(inputFile);
-    
+
     return arrSize;
 }
 
@@ -231,14 +234,17 @@ int main(int argc, char **argv) {
     setShape(&rocks[3], artThree, 1, 4);
     setShape(&rocks[4], artFour, 2, 2);
     
-    jetSize = loadJets("input17.txt", jets);
-    mainLoop(&chamber, rocks);
+    jetSize = loadJets("input17.txt", &jets);
+    mainLoop(&chamber, rocks, jets, jetSize);
+
+    printf("%d\n", chamber.height);
 
     // memory freeup
     for (int i=0; i<5; ++i) {
         freeShape(&rocks[i]);
     }
     freeShape(&chamber);
+    free(jets);
 
     return 0;
 }
