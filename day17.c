@@ -96,7 +96,6 @@ void addShape(Shape *chamber, Shape *sh) {
             break;
         }
     }
-    printf("\nk:\t%d, sh height:\t%d, ch height:\t%d\n", k, sh->height, chamber->height);
 
     reallocChamber(chamber, chamber->height-k+sh->height+3);    // realloc to fit new shape; +3 for gap
 
@@ -108,27 +107,62 @@ void addShape(Shape *chamber, Shape *sh) {
 }
 
 // fall down shape by one block
-int fallDown(Shape *chamber, int shapeWidth) {
+int move(Shape *chamber, int shapeWidth, char direction) {
     // fall down condition checking; exit function if cannot fall
     for (int i=0; i<chamber->height; ++i) {
         for (int j=0; j<chamber->width; ++j) {
-            if (chamber->grid[j][i] == '@' && (chamber->grid[j][i+1] == '#' || i == chamber->height-1)) {
+            if (chamber->grid[j][i] == '@' && (direction == '|' && (i == chamber->height-1 || chamber->grid[j][i+1] == '#'))) {
                 return 0;
+            } else if (chamber->grid[j][i] == '@' && (
+                (direction == '>' && (j == chamber->width-1 || chamber->grid[j+1][i] == '#')) ||
+                (direction == '<' && (j == 0 || chamber->grid[j-1][i] == '#')))
+            ) {
+                printf("returning 1\n");
+                return 1;
             }
         }
     }
 
-    // actual falling down
-    for (int i=chamber->height; i>=0; --i) {    // from bottom to top
-        for (int j=0; j<chamber->width; ++j) {
-            if (chamber->grid[j][i] == '@') {   // for each @ (rock element)
-                    chamber->grid[j][i+1] = '@';
-                    chamber->grid[j][i] = '.';
-            }
-        }
-    }
 
+    switch (direction) {
+        case '|':   // actual falling down
+            for (int i=chamber->height; i>=0; --i) {    // from bottom to top
+                for (int j=0; j<chamber->width; ++j) {
+                    if (chamber->grid[j][i] == '@') {   // for each @ (rock element)
+                            chamber->grid[j][i+1] = '@';
+                            chamber->grid[j][i] = '.';
+                    }
+                }
+            }
+            break;
+        
+        case '>':   // moving to right
+            for (int i=0; i<chamber->height; ++i) {
+                for (int j=chamber->width-1; j>=0; --j) {  // from right to left
+                    if (chamber->grid[j][i] == '@') {   // for each @ (rock element)
+                            chamber->grid[j+1][i] = '@';
+                            chamber->grid[j][i] = '.';
+                    }
+                }
+            }
+            break;
+        
+        case '<':   // moving to left
+            for (int i=0; i<chamber->height; ++i) {
+                for (int j=0; j<chamber->width; ++j) {  // from left to right
+                    if (chamber->grid[j][i] == '@') {   // for each @ (rock element)
+                            chamber->grid[j-1][i] = '@';
+                            chamber->grid[j][i] = '.';
+                    }
+                }
+            }
+            break;
+        
+        default:
+            break;
+        }
     return 1;
+    
 }
 
 // replaces '@' to '#'
@@ -144,11 +178,14 @@ void solidifyRocks(Shape *chamber) {
 
 // main loop of moving
 void mainLoop(Shape *chamber, Shape *rocks) {
-    for (int i=0; i<7; ++i) {
+    int alternate = 0;
+
+    for (int i=0; i<1; ++i) {
         addShape(chamber, &rocks[i%5]);
         show(chamber->grid, chamber->width, chamber->height);
-        while (fallDown(chamber, rocks[i%5].width)) {
+        while (move(chamber, rocks[i%5].width, alternate ? '>' : '|')) {
             show(chamber->grid, chamber->width, chamber->height);
+            alternate = !alternate;
         }
         solidifyRocks(chamber);
         show(chamber->grid, chamber->width, chamber->height);
