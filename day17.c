@@ -191,9 +191,12 @@ void mainLoop(Shape *chamber, Shape *rocks, char *jetStream, int jetSize) {
     int jetCounter = 0;
 
     for (int i=0; i<2022; ++i) {
+        printf("iteration:\t%d\nshape:\n", i);
+        show(rocks[i%5].grid, rocks[i%5].width, rocks[i%5].height);
+
         alternate = 1;  // always start from left/right push
         addShape(chamber, &rocks[i%5]);
-        while (move(chamber, rocks[i%5].width, alternate ? jetStream[jetCounter%jetSize] : '|')) {
+        while (move(chamber, rocks[i%5].width, alternate ? jetStream[jetCounter%(jetSize-1)] : '|')) {
             if (alternate) {
                 jetCounter++;
             }
@@ -202,7 +205,6 @@ void mainLoop(Shape *chamber, Shape *rocks, char *jetStream, int jetSize) {
         solidifyRocks(chamber);
         // show(rocks[i%5].grid, rocks[i%5].width, rocks[i%5].height);
         // show(chamber->grid, chamber->width, chamber->height);
-        printf("%d\n", i);
     }
 }
 
