@@ -70,16 +70,16 @@ void reallocChamber(Shape *cham, int newHeight) {
         }
     }
 
-    if (heightDiff >= 0) {
+    if (heightDiff >= 0) {  // new chamber is bigger than existing one
         for (int i=0; i<oldHeight; ++i) {
             for (int j=0; j<7; ++j) {
                 newGrid[j][i+heightDiff] = cham->grid[j][i];
             }
         }
-    } else {
-        for (int i=0; i<oldHeight; ++i) {
+    } else {    // new chamber is smaller than existing one
+        for (int i=0; i<newHeight; ++i) {
             for (int j=0; j<7; ++j) {
-                newGrid[j][i] = cham->grid[j][i-heightDiff];
+                newGrid[j][i] = cham->grid[j][i-heightDiff];    // heightDiff is negative in this scenario
             }
         }
     }
