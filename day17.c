@@ -1,10 +1,11 @@
 #include "stdio.h"
 #include "stdlib.h"
+#include "stdint.h"
 
-// day 8 code function modified to and use char instead of int and decorate
-void show(char **arr2d, int nx, int ny) {
-    for(int i=0; i<ny; ++i) {
-        for(int j=0; j<nx; ++j) {
+// day 8 code function modified to and use char instead of int64_t and decorate
+void show(char **arr2d, int64_t nx, int64_t ny) {
+    for(int64_t i=0; i<ny; ++i) {
+        for(int64_t j=0; j<nx; ++j) {
             if (j==0) {
                 printf("|");
             }
@@ -16,31 +17,31 @@ void show(char **arr2d, int nx, int ny) {
         printf("\n");
     }
     printf("+");
-    for(int i=0; i<nx; ++i) {
+    for(int64_t i=0; i<nx; ++i) {
         printf("-");
     }
     printf("+\n");
 }
 
 typedef struct Shape {
-    int     width;
-    int     height;
+    int64_t     width;
+    int64_t     height;
     char    **grid;
 } Shape;
 
-void setShape(Shape *s, char *artLine, int newW, int newH) {
-    int artCounter = 0;
+void setShape(Shape *s, char *artLine, int64_t newW, int64_t newH) {
+    int64_t artCounter = 0;
 
     s->width = newW;
     s->height = newH;
 
     s->grid = malloc(sizeof(char*)*newW);
-    for (int i=0; i<newW; ++i) {
+    for (int64_t i=0; i<newW; ++i) {
         s->grid[i] = malloc(sizeof(char)*newH);
     }
 
-    for (int i=0; i<newH; ++i) {
-        for (int j=0; j<newW; ++j) {
+    for (int64_t i=0; i<newH; ++i) {
+        for (int64_t j=0; j<newW; ++j) {
             s->grid[j][i] = artLine[artCounter];
             artCounter++;
         }
@@ -49,36 +50,36 @@ void setShape(Shape *s, char *artLine, int newW, int newH) {
 
 // freeup memory of shape
 void freeShape(Shape *sh) {
-    for (int j=0; j<sh->width; ++j) {
+    for (int64_t j=0; j<sh->width; ++j) {
         free(sh->grid[j]);
     }
     free(sh->grid);
 }
 
-void reallocChamber(Shape *cham, int newHeight) {
-    int     oldHeight = cham->height;
-    int     heightDiff = newHeight - oldHeight;
+void reallocChamber(Shape *cham, int64_t newHeight) {
+    int64_t     oldHeight = cham->height;
+    int64_t     heightDiff = newHeight - oldHeight;
     char    **newGrid = malloc(sizeof(char*)*cham->width);
 
-    for (int i=0; i<cham->width; ++i) {
+    for (int64_t i=0; i<cham->width; ++i) {
         newGrid[i] = malloc(sizeof(char)*newHeight);
     }
 
-    for (int i=0; i<heightDiff; ++i) {
-        for (int j=0; j<cham->width; ++j) {
+    for (int64_t i=0; i<heightDiff; ++i) {
+        for (int64_t j=0; j<cham->width; ++j) {
             newGrid[j][i] = '.';
         }
     }
 
     if (heightDiff >= 0) {  // new chamber is bigger than existing one
-        for (int i=0; i<oldHeight; ++i) {
-            for (int j=0; j<cham->width; ++j) {
+        for (int64_t i=0; i<oldHeight; ++i) {
+            for (int64_t j=0; j<cham->width; ++j) {
                 newGrid[j][i+heightDiff] = cham->grid[j][i];
             }
         }
     } else {    // new chamber is smaller than existing one
-        for (int i=0; i<newHeight; ++i) {
-            for (int j=0; j<cham->width; ++j) {
+        for (int64_t i=0; i<newHeight; ++i) {
+            for (int64_t j=0; j<cham->width; ++j) {
                 newGrid[j][i] = cham->grid[j][i-heightDiff];    // heightDiff is negative in this scenario
             }
         }
@@ -92,11 +93,11 @@ void reallocChamber(Shape *cham, int newHeight) {
 }
 
 // return the highest spot in chamber
-int findHighestSpot(Shape *chamber) {
-    int k = 0;
-    int brkK = 0;
+int64_t findHighestSpot(Shape *chamber) {
+    int64_t k = 0;
+    int64_t brkK = 0;
     for (k; k<chamber->height; ++k) {
-        for (int i=0; i<chamber->width; ++i) {
+        for (int64_t i=0; i<chamber->width; ++i) {
             if (chamber->grid[i][k] == '#') {
                 brkK = 1;
                 break;
@@ -114,18 +115,18 @@ int findHighestSpot(Shape *chamber) {
 void addShape(Shape *chamber, Shape *sh) {
     reallocChamber(chamber, findHighestSpot(chamber)+sh->height+3);    // realloc to fit new shape; +3 for gap
 
-    for (int i=0; i<sh->height; ++i) {  // add shape to chamber grid
-        for (int j=0; j<sh->width; ++j) {
+    for (int64_t i=0; i<sh->height; ++i) {  // add shape to chamber grid
+        for (int64_t j=0; j<sh->width; ++j) {
             chamber->grid[j+2][i] = sh->grid[j][i];
         }
     }
 }
 
 // fall down shape by one block
-int move(Shape *chamber, int shapeWidth, char direction) {
+int64_t move(Shape *chamber, int64_t shapeWidth, char direction) {
     // fall down condition checking; exit function if cannot fall
-    for (int i=0; i<chamber->height; ++i) {
-        for (int j=0; j<chamber->width; ++j) {
+    for (int64_t i=0; i<chamber->height; ++i) {
+        for (int64_t j=0; j<chamber->width; ++j) {
             if (chamber->grid[j][i] == '@' && (direction == '|' && (i == chamber->height-1 || chamber->grid[j][i+1] == '#'))) {
                 return 0;
             } else if (chamber->grid[j][i] == '@' && (
@@ -140,8 +141,8 @@ int move(Shape *chamber, int shapeWidth, char direction) {
 
     switch (direction) {
         case '|':   // actual falling down
-            for (int i=chamber->height; i>=0; --i) {    // from bottom to top
-                for (int j=0; j<chamber->width; ++j) {
+            for (int64_t i=chamber->height; i>=0; --i) {    // from bottom to top
+                for (int64_t j=0; j<chamber->width; ++j) {
                     if (chamber->grid[j][i] == '@') {   // for each @ (rock element)
                             chamber->grid[j][i+1] = '@';
                             chamber->grid[j][i] = '.';
@@ -151,8 +152,8 @@ int move(Shape *chamber, int shapeWidth, char direction) {
             break;
         
         case '>':   // moving to right
-            for (int i=0; i<chamber->height; ++i) {
-                for (int j=chamber->width-1; j>=0; --j) {  // from right to left
+            for (int64_t i=0; i<chamber->height; ++i) {
+                for (int64_t j=chamber->width-1; j>=0; --j) {  // from right to left
                     if (chamber->grid[j][i] == '@') {   // for each @ (rock element)
                             chamber->grid[j+1][i] = '@';
                             chamber->grid[j][i] = '.';
@@ -162,8 +163,8 @@ int move(Shape *chamber, int shapeWidth, char direction) {
             break;
         
         case '<':   // moving to left
-            for (int i=0; i<chamber->height; ++i) {
-                for (int j=0; j<chamber->width; ++j) {  // from left to right
+            for (int64_t i=0; i<chamber->height; ++i) {
+                for (int64_t j=0; j<chamber->width; ++j) {  // from left to right
                     if (chamber->grid[j][i] == '@') {   // for each @ (rock element)
                             chamber->grid[j-1][i] = '@';
                             chamber->grid[j][i] = '.';
@@ -181,8 +182,8 @@ int move(Shape *chamber, int shapeWidth, char direction) {
 
 // replaces '@' to '#'
 void solidifyRocks(Shape *chamber) {
-    for (int i=0; i<chamber->height; ++i) {
-        for (int j=0; j<chamber->width; ++j) {
+    for (int64_t i=0; i<chamber->height; ++i) {
+        for (int64_t j=0; j<chamber->width; ++j) {
             if (chamber->grid[j][i] == '@') {
                 chamber->grid[j][i] = '#';
             }
@@ -191,13 +192,13 @@ void solidifyRocks(Shape *chamber) {
 }
 
 // main loop of moving
-void mainLoop(Shape *chamber, Shape *rocks, char *jetStream, int jetSize) {
-    int alternate;
-    int jetCounter = 0;
+void mainLoop(Shape *chamber, Shape *rocks, char *jetStream, int64_t jetSize) {
+    int64_t alternate;
+    int64_t jetCounter = 0;
 
-    for (int i=0; i<2022; ++i) {
-        printf("iteration:\t%d\nshape:\n", i);
-        show(rocks[i%5].grid, rocks[i%5].width, rocks[i%5].height);
+    for (int64_t i=0; i<1000000000000; ++i) {
+        printf("iteration:\t%ld\n", i);
+        // show(rocks[i%5].grid, rocks[i%5].width, rocks[i%5].height);
 
         alternate = 1;  // always start from left/right push
         addShape(chamber, &rocks[i%5]);
@@ -217,9 +218,9 @@ void mainLoop(Shape *chamber, Shape *rocks, char *jetStream, int jetSize) {
 
 // load jets into array; return array size
 // note: does not work with \n at the end of file
-int loadJets(char *fileName, char **jetArray) {
+int64_t loadJets(char *fileName, char **jetArray) {
     FILE    *inputFile;
-    int     arrSize;
+    int64_t     arrSize;
 
     inputFile = fopen(fileName, "r");
     fseek(inputFile, 0L, SEEK_END);
@@ -234,12 +235,12 @@ int loadJets(char *fileName, char **jetArray) {
     return arrSize;
 }
 
-int main(int argc, char **argv) {
+int64_t main(int64_t argc, char **argv) {
     Shape   chamber;
     Shape   rocks[5];
 
     char    *jets;
-    int     jetSize;
+    int64_t     jetSize;
 
     char    artChamber[7*1] = ".......";
     char    artZero[4*1] = "@@@@";
@@ -259,10 +260,10 @@ int main(int argc, char **argv) {
     mainLoop(&chamber, rocks, jets, jetSize);
 
     show(chamber.grid, chamber.width, chamber.height);
-    printf("%d\n", chamber.height);
+    printf("%ld\n", chamber.height);
 
     // memory freeup
-    for (int i=0; i<5; ++i) {
+    for (int64_t i=0; i<5; ++i) {
         freeShape(&rocks[i]);
     }
     freeShape(&chamber);
