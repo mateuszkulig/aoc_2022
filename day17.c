@@ -58,27 +58,27 @@ void freeShape(Shape *sh) {
 void reallocChamber(Shape *cham, int newHeight) {
     int     oldHeight = cham->height;
     int     heightDiff = newHeight - oldHeight;
-    char    **newGrid = malloc(sizeof(char*)*7);
+    char    **newGrid = malloc(sizeof(char*)*cham->width);
 
-    for (int i=0; i<7; ++i) {
+    for (int i=0; i<cham->width; ++i) {
         newGrid[i] = malloc(sizeof(char)*newHeight);
     }
 
     for (int i=0; i<heightDiff; ++i) {
-        for (int j=0; j<7; ++j) {
+        for (int j=0; j<cham->width; ++j) {
             newGrid[j][i] = '.';
         }
     }
 
     if (heightDiff >= 0) {  // new chamber is bigger than existing one
         for (int i=0; i<oldHeight; ++i) {
-            for (int j=0; j<7; ++j) {
+            for (int j=0; j<cham->width; ++j) {
                 newGrid[j][i+heightDiff] = cham->grid[j][i];
             }
         }
     } else {    // new chamber is smaller than existing one
         for (int i=0; i<newHeight; ++i) {
-            for (int j=0; j<7; ++j) {
+            for (int j=0; j<cham->width; ++j) {
                 newGrid[j][i] = cham->grid[j][i-heightDiff];    // heightDiff is negative in this scenario
             }
         }
