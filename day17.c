@@ -91,11 +91,11 @@ void reallocChamber(Shape *cham, int newHeight) {
     cham->height = newHeight;
 }
 
-// adds shape to the top of chamber
-void addShape(Shape *chamber, Shape *sh) {
+// return the highest spot in chamber
+int findHighestSpot(Shape *chamber) {
     int k = 0;
     int brkK = 0;
-    for (k; k<chamber->height; ++k) {   // find the highest spot
+    for (k; k<chamber->height; ++k) {
         for (int i=0; i<chamber->width; ++i) {
             if (chamber->grid[i][k] == '#') {
                 brkK = 1;
@@ -107,7 +107,12 @@ void addShape(Shape *chamber, Shape *sh) {
         }
     }
 
-    reallocChamber(chamber, chamber->height-k+sh->height+3);    // realloc to fit new shape; +3 for gap
+    return chamber->height-k;
+}
+
+// adds shape to the top of chamber
+void addShape(Shape *chamber, Shape *sh) {
+    reallocChamber(chamber, findHighestSpot(chamber)+sh->height+3);    // realloc to fit new shape; +3 for gap
 
     for (int i=0; i<sh->height; ++i) {  // add shape to chamber grid
         for (int j=0; j<sh->width; ++j) {
@@ -206,6 +211,8 @@ void mainLoop(Shape *chamber, Shape *rocks, char *jetStream, int jetSize) {
         // show(rocks[i%5].grid, rocks[i%5].width, rocks[i%5].height);
         // show(chamber->grid, chamber->width, chamber->height);
     }
+
+    reallocChamber(chamber, findHighestSpot(chamber));  // clear empty space at the top
 }
 
 // load jets into array; return array size
