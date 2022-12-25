@@ -216,6 +216,7 @@ void mainLoop(Shape *chamber, Shape *rocks, char *jetStream, int jetSize) {
 }
 
 // load jets into array; return array size
+// note: does not work with \n at the end of file
 int loadJets(char *fileName, char **jetArray) {
     FILE    *inputFile;
     int     arrSize;
