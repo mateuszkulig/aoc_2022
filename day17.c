@@ -26,7 +26,8 @@ void show(char **arr2d, int64_t nx, int64_t ny) {
 typedef struct Shape {
     int64_t     width;
     int64_t     height;
-    char    **grid;
+    char        **grid;
+    int64_t     trueHeight;
 } Shape;
 
 void setShape(Shape *s, char *artLine, int64_t newW, int64_t newH) {
@@ -34,6 +35,7 @@ void setShape(Shape *s, char *artLine, int64_t newW, int64_t newH) {
 
     s->width = newW;
     s->height = newH;
+    s->trueHeight = newH;
 
     s->grid = malloc(sizeof(char*)*newW);
     for (int64_t i=0; i<newW; ++i) {
@@ -78,7 +80,7 @@ void reallocChamber(Shape *cham, int64_t newHeight) {
             }
         }
     } else {    // new chamber is smaller than existing one
-        for (int64_t i=0; i<newHeight; ++i) {
+        for (int64_t i=newHeight-1; i>=0; --i) {
             for (int64_t j=0; j<cham->width; ++j) {
                 newGrid[j][i] = cham->grid[j][i-heightDiff];    // heightDiff is negative in this scenario
             }
@@ -90,6 +92,7 @@ void reallocChamber(Shape *cham, int64_t newHeight) {
     freeShape(cham);
     cham->grid = newGrid;
     cham->height = newHeight;
+    cham->trueHeight += heightDiff;
 }
 
 // return the highest spot in chamber
@@ -196,7 +199,7 @@ void mainLoop(Shape *chamber, Shape *rocks, char *jetStream, int64_t jetSize) {
     int64_t alternate;
     int64_t jetCounter = 0;
 
-    for (int64_t i=0; i<1000000000000; ++i) {
+    for (int64_t i=0; i<2022; ++i) {
         printf("iteration:\t%ld\n", i);
         // show(rocks[i%5].grid, rocks[i%5].width, rocks[i%5].height);
 
@@ -209,8 +212,12 @@ void mainLoop(Shape *chamber, Shape *rocks, char *jetStream, int64_t jetSize) {
             alternate = !alternate;
         }
         solidifyRocks(chamber);
-        // show(rocks[i%5].grid, rocks[i%5].width, rocks[i%5].height);
         // show(chamber->grid, chamber->width, chamber->height);
+
+        // if (i % 1000 && i>1000) {
+        //     chamber->trueHeight += -(100 - chamber->height);
+        //     reallocChamber(chamber, 100);
+        // }
     }
 
     reallocChamber(chamber, findHighestSpot(chamber));  // clear empty space at the top
@@ -260,7 +267,7 @@ int64_t main(int64_t argc, char **argv) {
     mainLoop(&chamber, rocks, jets, jetSize);
 
     show(chamber.grid, chamber.width, chamber.height);
-    printf("%ld\n", chamber.height);
+    printf("%ld\n", chamber.trueHeight);
 
     // memory freeup
     for (int64_t i=0; i<5; ++i) {
