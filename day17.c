@@ -99,7 +99,6 @@ void reallocChamber(Shape *cham, int64_t newHeight) {
 void shiftChamber(Shape *cham, int64_t newHeight) {
     int64_t     heightDiff = newHeight - cham->height;
 
-    printf("heightdiff: %ld\n", heightDiff);
     if (heightDiff > 0) {
         printf("new height is bigger than current height; cannot shift down\n");
         return;
@@ -226,8 +225,8 @@ void mainLoop(Shape *chamber, Shape *rocks, char *jetStream, int64_t jetSize) {
     int64_t alternate;
     int64_t jetCounter = 0;
 
-    for (int64_t i=0; i<2022; ++i) {
-        printf("iteration:\t%ld\n", i);
+    for (int64_t i=0; i<1000000; ++i) {
+        // printf("iteration:\t%ld\n", i);
         // show(rocks[i%5].grid, rocks[i%5].width, rocks[i%5].height);
 
         alternate = 1;  // always start from left/right push
@@ -241,8 +240,8 @@ void mainLoop(Shape *chamber, Shape *rocks, char *jetStream, int64_t jetSize) {
         solidifyRocks(chamber);
         // show(chamber->grid, chamber->width, chamber->height);
 
-        if (!(i % 100)) {   // for optimalization
-            shiftChamber(chamber, 100);
+        if (!(i % 25)) {   // for optimalization
+            shiftChamber(chamber, 40);
         }
     }
 
