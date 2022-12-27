@@ -80,7 +80,7 @@ void reallocChamber(Shape *cham, int64_t newHeight) {
             }
         }
     } else {    // new chamber is smaller than existing one
-        for (int64_t i=newHeight-1; i>=0; --i) {
+        for (int64_t i=0; i<newHeight; ++i) {
             for (int64_t j=0; j<cham->width; ++j) {
                 newGrid[j][i] = cham->grid[j][i-heightDiff];    // heightDiff is negative in this scenario
             }
@@ -93,6 +93,33 @@ void reallocChamber(Shape *cham, int64_t newHeight) {
     cham->grid = newGrid;
     cham->height = newHeight;
     cham->trueHeight += heightDiff;
+}
+
+// shift items in chamber down to meet the new height
+void shiftChamber(Shape *cham, int64_t newHeight) {
+    int64_t     heightDiff = newHeight - cham->height;
+
+    printf("heightdiff: %ld\n", heightDiff);
+    if (heightDiff > 0) {
+        printf("new height is bigger than current height; cannot shift down\n");
+        return;
+    }
+
+    char **newGrid = malloc(sizeof(char*)*cham->width);
+
+    for (int64_t i=0; i<cham->width; ++i) {
+        newGrid[i] = malloc(sizeof(char)*newHeight);
+    }
+
+    for (int64_t i=0; i<newHeight; ++i) {
+        for (int64_t j=0; j<cham->width; ++j) {
+            newGrid[j][i] = cham->grid[j][i];
+        }
+    }
+
+    freeShape(cham);
+    cham->grid = newGrid;
+    cham->height = newHeight;
 }
 
 // return the highest spot in chamber
@@ -214,10 +241,9 @@ void mainLoop(Shape *chamber, Shape *rocks, char *jetStream, int64_t jetSize) {
         solidifyRocks(chamber);
         // show(chamber->grid, chamber->width, chamber->height);
 
-        // if (i % 1000 && i>1000) {
-        //     chamber->trueHeight += -(100 - chamber->height);
-        //     reallocChamber(chamber, 100);
-        // }
+        if (!(i % 100)) {   // for optimalization
+            shiftChamber(chamber, 100);
+        }
     }
 
     reallocChamber(chamber, findHighestSpot(chamber));  // clear empty space at the top
