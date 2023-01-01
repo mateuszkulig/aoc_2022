@@ -17,24 +17,24 @@ int main(int argc, char **argv) {
 
     while (!feof(inputFile)) {
         switch (bufferCounter % 4) {
-        case 0:
-            opponentPick = fgetc(inputFile);
-            break;
+            case 0:
+                opponentPick = fgetc(inputFile);
+                break;
 
-        case 1:
-            fgetc(inputFile);   // ignore space
-            break;
+            case 1:
+                fgetc(inputFile);   // ignore space
+                break;
 
-        case 2:
-            myPick = fgetc(inputFile);
-            break;
+            case 2:
+                myPick = fgetc(inputFile);
+                break;
 
-        case 3: // \n; start round
-            score += getRoundResult(myPick, opponentPick);
+            case 3: // \n; start round
+                score += getRoundResult(myPick, opponentPick);
 
-        default:
-            break;
-        }
+            default:
+                break;
+            }
         bufferCounter++;
     }
 
@@ -42,10 +42,30 @@ int main(int argc, char **argv) {
 }
 
 int getRoundResult(char myP, char opP) {
-    char    rock1 = 'A';
-    char    paper1 = 'B';
-    char    scissors1 = 'C';
-    char    rock2 = 'X';
-    char    paper2 = 'Y';
-    char    scissors2 = 'Z';
+    int score;
+
+    switch (myP) {  // starting score
+        case 'X':
+            score = 1;
+            if (opP == 'A') {
+                score += 3;
+            } else if (opP == 'Y') {
+                score += 6;
+            }
+            break;
+    
+        case 'Y':
+            score = 2;
+            break;
+        
+        case 'Z':
+            score = 3;
+            break;
+        
+        default:
+            break;
+    }
+
+
+    return score;
 }
