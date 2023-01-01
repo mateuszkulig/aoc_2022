@@ -30,6 +30,7 @@ int main(int argc, char **argv) {
                 break;
 
             case 3: // \n; start round
+                fgetc(inputFile);   // ignore \n
                 score += getRoundResult(myPick, opponentPick);
 
             default:
@@ -38,6 +39,7 @@ int main(int argc, char **argv) {
         bufferCounter++;
     }
 
+    printf("%d\n", score);
     return 0;
 }
 
@@ -49,17 +51,27 @@ int getRoundResult(char myP, char opP) {
             score = 1;
             if (opP == 'A') {
                 score += 3;
-            } else if (opP == 'Y') {
+            } else if (opP == 'C') {
                 score += 6;
             }
             break;
     
         case 'Y':
             score = 2;
+            if (opP == 'B') {
+                score += 3;
+            } else if (opP == 'A') {
+                score += 6;
+            }
             break;
         
         case 'Z':
             score = 3;
+            if (opP == 'C') {
+                score += 3;
+            } else if (opP == 'B') {
+                score += 6;
+            }
             break;
         
         default:
