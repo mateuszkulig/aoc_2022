@@ -3,6 +3,7 @@
 
 int getRoundResult(char myP, char opP);
 
+int get2ndPartResult(char myP, char opP);
 
 int main(int argc, char **argv) {
     int     score = 0;
@@ -31,7 +32,8 @@ int main(int argc, char **argv) {
 
             case 3: // \n; start round
                 fgetc(inputFile);   // ignore \n
-                score += getRoundResult(myPick, opponentPick);
+                // score += getRoundResult(myPick, opponentPick);   // first part
+                score += get2ndPartResult(myPick, opponentPick);
 
             default:
                 break;
@@ -43,6 +45,43 @@ int main(int argc, char **argv) {
     return 0;
 }
 
+// get result of 2nd part; just select proper pick and add win/lose/draw
+// this could be also done with lopping over array because every next pick beats previous
+int get2ndPartResult(char myP, char opP) {
+    switch (opP) {
+        case 'A':
+            if (myP == 'X') {
+                return 3 + 0;   // scissors + lose
+            } else if (myP == 'Y') {
+                return 1 + 3;   // rock + draw
+            } else {
+                return 2 + 6;   // paper + win
+            }
+            
+        case 'B':
+            if (myP == 'X') {
+                return 1 + 0;   // rock + lose
+            } else if (myP == 'Y') {
+                return 2 + 3;   // paper + draw
+            } else {
+                return 3 + 6;   // scissors + win
+            }
+        
+        case 'C':
+            if (myP == 'X') {
+                return 2 + 0;   // paper + lose
+            } else if (myP == 'Y') {
+                return 3 + 3;   // scissors + draw
+            } else {
+                return 1 + 6;   // rock + win
+            }
+        
+        default:
+            return 0;
+    }
+}
+
+// get the result score of the round
 int getRoundResult(char myP, char opP) {
     int score;
 
@@ -77,7 +116,6 @@ int getRoundResult(char myP, char opP) {
         default:
             break;
     }
-
 
     return score;
 }
