@@ -7,16 +7,23 @@ char findSharingItem(char *buffer);
 int getBufferLength(char *buffer);
 
 int main(int argc, char **argv) {
-    FILE *inputFile;
-    char buffer[128];
-    
+    FILE    *inputFile;
+    char    buffer[128];
+    char    repeating;
+    int     total = 0;
     
     inputFile = fopen("input3.txt", "r");
     
     while (fgets(buffer, 128, inputFile) != 0) {
-        printf("%c\n", findSharingItem(buffer));
+        repeating = findSharingItem(buffer);
+        if (repeating < 97) {   // upper letter
+            total += repeating - 65 + 27;   // A ascii code is 65, upper letter priorities start with 27
+        } else {
+            total += repeating - 97 + 1;    // a ascii code is 97, lower letter priorities start with 1
+        }
     }
 
+    printf("%d\n", total);
     fclose(inputFile);
 
     return 0;
@@ -35,7 +42,7 @@ char findSharingItem(char *buffer) {
     }
     firstHalf[halfBufferLength] = '\0';
     secondHalf[halfBufferLength] = '\0';
-    printf("first:\t%s\t\tsecond:\t%s\n", firstHalf, secondHalf);
+    // printf("first:\t%s\t\tsecond:\t%s\n", firstHalf, secondHalf);
 
     for (int i=0; i<halfBufferLength; ++i) {
         for (int j=0; j<halfBufferLength; ++j) {
